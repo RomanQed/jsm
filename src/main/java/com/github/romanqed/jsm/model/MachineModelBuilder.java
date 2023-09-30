@@ -191,18 +191,10 @@ public final class MachineModelBuilder<S, T> {
 
     private Set<Transition<S, T>> collectTransitions(S state, Set<S> unreachable) {
         var ret = new HashSet<Transition<S, T>>();
-        var count = 0;
-        for (var entry : transitions.get(state).entrySet()) {
-            unreachable.remove(entry.getKey());
-            var transition = entry.getValue();
-            if (transition.getType() == TransitionType.UNCONDITIONAL) {
-                ++count;
-            }
-            ret.add(transition);
-        }
-        if (count > 1) {
-            throw new InvalidStateException("State cannot contains more than 1 unconditional transition", state);
-        }
+        transitions.get(state).forEach((k, v) -> {
+            unreachable.remove(k);
+            ret.add(v);
+        });
         return ret;
     }
 
