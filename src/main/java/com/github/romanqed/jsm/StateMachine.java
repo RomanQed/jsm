@@ -1,4 +1,4 @@
-package com.github.romanqed.dfsm;
+package com.github.romanqed.jsm;
 
 /**
  * Interface describing a finite state machine.
