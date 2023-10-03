@@ -4,14 +4,14 @@ import com.github.romanqed.jsm.StateMachine;
 
 import java.util.Map;
 
-public final class BytecodeMachine<S, T> implements StateMachine<S, T> {
+final class BytecodeMachine<S, T> implements StateMachine<S, T> {
     private final TransitionFunction<T> function;
     private final Map<Integer, S> translations;
     private final int init;
     private final Object lock;
     private int state;
 
-    public BytecodeMachine(TransitionFunction<T> function, Map<Integer, S> translations, int init) {
+    BytecodeMachine(TransitionFunction<T> function, Map<Integer, S> translations, int init) {
         this.function = function;
         this.translations = translations;
         this.init = init;

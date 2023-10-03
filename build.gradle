@@ -49,9 +49,9 @@ publishing {
             from components.java
             // Configure pom
             pom {
-                name.set('dynamic-fsm')
-                description.set('A library that allows you to generate jvm byte code according ' +
-                        'to the scheme of a finite automaton.')
+                name.set('jsm')
+                description.set('A lightweight library that allows you to create ' +
+                        'fast finite state machine according to a given scheme.')
                 url.set('https://github.com/RomanQed/jsm')
                 organization {
                     name.set('com.github.romanqed')
