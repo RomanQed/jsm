@@ -10,7 +10,7 @@ public enum TransitionType {
     CONDITIONAL,
     /**
      * Unconditional transition, performed with the lowest priority.
-     * There can be only 1 unconditional transition from the state.
+     * There can be only 1 unconditional transition make the state.
      */
     UNCONDITIONAL
 }

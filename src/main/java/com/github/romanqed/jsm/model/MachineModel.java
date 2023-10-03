@@ -1,7 +1,7 @@
 package com.github.romanqed.jsm.model;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * @param <S> state type
@@ -11,13 +11,13 @@ public final class MachineModel<S, T> {
     private final Class<T> tokenType;
     private final State<S, T> init;
     private final State<S, T> exit;
-    private final Set<State<S, T>> states;
+    private final Map<S, State<S, T>> states;
 
-    MachineModel(Class<T> tokenType, State<S, T> init, State<S, T> exit, Set<State<S, T>> states) {
+    MachineModel(Class<T> tokenType, State<S, T> init, State<S, T> exit, Map<S, State<S, T>> states) {
         this.tokenType = tokenType;
         this.init = init;
         this.exit = exit;
-        this.states = Collections.unmodifiableSet(states);
+        this.states = Collections.unmodifiableMap(states);
     }
 
     /**
@@ -48,11 +48,11 @@ public final class MachineModel<S, T> {
     }
 
     /**
-     * Returns a set of intermediate states of a finite state machine.
+     * Returns a map of intermediate states of a finite state machine.
      *
-     * @return a set of intermediate states of a finite state machine
+     * @return a map of intermediate states of a finite state machine
      */
-    public Set<State<S, T>> getStates() {
+    public Map<S, State<S, T>> getStates() {
         return states;
     }
 
@@ -63,5 +63,20 @@ public final class MachineModel<S, T> {
                 ", exit=" + exit +
                 ", states=" + states +
                 '}';
+    }
+
+    /**
+     * Returns the internal string representation of a finite state machine.
+     *
+     * @return the internal string representation of a finite state machine
+     */
+    public String toSpecString() {
+        var builder = new StringBuilder();
+        builder.append(exit.toSpecString());
+        builder.append(init.toSpecString());
+        for (var state : states.values()) {
+            builder.append(state.toSpecString());
+        }
+        return builder.toString();
     }
 }

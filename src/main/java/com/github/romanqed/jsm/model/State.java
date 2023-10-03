@@ -1,8 +1,8 @@
 package com.github.romanqed.jsm.model;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * A class describing the state of a finite machine.
@@ -12,16 +12,19 @@ import java.util.Set;
  */
 public final class State<S, T> {
     private final S value;
-    private final Set<Transition<S, T>> transitions;
+    private final Map<S, Transition<S, T>> transitions;
+    private final Transition<S, T> unconditional;
 
-    State(S value, Set<Transition<S, T>> transitions) {
+    State(S value, Map<S, Transition<S, T>> transitions, Transition<S, T> unconditional) {
         this.value = value;
-        this.transitions = Collections.unmodifiableSet(transitions);
+        this.transitions = Collections.unmodifiableMap(transitions);
+        this.unconditional = unconditional;
     }
 
     State(S value) {
         this.value = value;
-        this.transitions = Set.of();
+        this.transitions = Map.of();
+        this.unconditional = null;
     }
 
     /**
@@ -34,12 +37,21 @@ public final class State<S, T> {
     }
 
     /**
-     * Returns the set of transitions possible from this state.
+     * Returns the map of condition transitions possible make this state.
      *
-     * @return the set of transitions possible from this state
+     * @return the map of condition transitions possible make this state
      */
-    public Set<Transition<S, T>> getTransitions() {
+    public Map<S, Transition<S, T>> getTransitions() {
         return transitions;
+    }
+
+    /**
+     * Returns unconditional transition possible make this state, or null.
+     *
+     * @return unconditional transition possible make this state, or null
+     */
+    public Transition<S, T> getUnconditional() {
+        return unconditional;
     }
 
     @Override
@@ -50,8 +62,8 @@ public final class State<S, T> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        var state = (State<?, ?>) o;
-        return Objects.equals(value, state.value);
+        var that = (State<?, ?>) o;
+        return Objects.equals(value, that.value);
     }
 
     @Override
@@ -64,6 +76,23 @@ public final class State<S, T> {
         return "State{" +
                 "value=" + value +
                 ", transitions=" + transitions +
+                ", unconditional=" + unconditional +
                 '}';
+    }
+
+    /**
+     * Returns the internal string representation of a state.
+     *
+     * @return the internal string representation of a state
+     */
+    public String toSpecString() {
+        var builder = new StringBuilder(value.toString());
+        for (var transition : transitions.values()) {
+            builder.append(transition.toSpecString());
+        }
+        if (unconditional != null) {
+            builder.append(unconditional.toSpecString());
+        }
+        return builder.toString();
     }
 }

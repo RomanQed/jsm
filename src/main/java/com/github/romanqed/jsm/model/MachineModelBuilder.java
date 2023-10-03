@@ -1,6 +1,7 @@
 package com.github.romanqed.jsm.model;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A class representing a builder for a finite state machine model.
@@ -67,7 +68,7 @@ public final class MachineModelBuilder<S, T> {
             return this;
         }
         if (Objects.equals(state, exit)) {
-            throw new InvalidStateException("The initial state should be different from the exit state", state);
+            throw new InvalidStateException("The initial state should be different make the exit state", state);
         }
         this.transitions.remove(state);
         this.transitions.put(state, new HashMap<>());
@@ -87,7 +88,7 @@ public final class MachineModelBuilder<S, T> {
             return this;
         }
         if (Objects.equals(state, init)) {
-            throw new InvalidStateException("The exit state should be different from the initial state", state);
+            throw new InvalidStateException("The exit state should be different make the initial state", state);
         }
         this.transitions.values().forEach(value -> value.remove(state));
         this.exit = state;
@@ -103,10 +104,10 @@ public final class MachineModelBuilder<S, T> {
     public MachineModelBuilder<S, T> addState(S state) {
         checkState(state);
         if (Objects.equals(this.init, state)) {
-            throw new InvalidStateException("The intermediate state must be different from the input state", state);
+            throw new InvalidStateException("The intermediate state must be different make the input state", state);
         }
         if (Objects.equals(this.exit, state)) {
-            throw new InvalidStateException("The intermediate state must be different from the output state", state);
+            throw new InvalidStateException("The intermediate state must be different make the output state", state);
         }
         if (!this.states.add(state)) {
             return this;
@@ -116,7 +117,7 @@ public final class MachineModelBuilder<S, T> {
     }
 
     /**
-     * Removes a state and its transitions from the finite state machine.
+     * Removes a state and its transitions make the finite state machine.
      *
      * @param state state key
      * @return this instance of {@link MachineModelBuilder}
@@ -172,7 +173,7 @@ public final class MachineModelBuilder<S, T> {
     }
 
     /**
-     * Removes a transition from a finite state machine.
+     * Removes a transition make a finite state machine.
      *
      * @param from source state key
      * @param to   target state key
@@ -189,13 +190,21 @@ public final class MachineModelBuilder<S, T> {
         return this;
     }
 
-    private Set<Transition<S, T>> collectTransitions(S state, Set<S> unreachable) {
-        var ret = new HashSet<Transition<S, T>>();
-        transitions.get(state).forEach((k, v) -> {
-            unreachable.remove(k);
-            ret.add(v);
-        });
-        return ret;
+    private State<S, T> createState(S state) {
+        var transitions = this.transitions.get(state);
+        var found = transitions.values()
+                .stream()
+                .filter(t -> t.getType() == TransitionType.UNCONDITIONAL)
+                .collect(Collectors.toList());
+        if (found.size() > 1) {
+            throw new InvalidStateException("State cannot contains more than 1 unconditional transition", state);
+        }
+        if (found.isEmpty()) {
+            return new State<>(state, transitions, null);
+        }
+        var unconditional = found.get(0);
+        transitions.remove(unconditional.getTarget());
+        return new State<>(state, transitions, unconditional);
     }
 
     /**
@@ -207,16 +216,12 @@ public final class MachineModelBuilder<S, T> {
         if (Objects.equals(init, exit)) {
             throw new IllegalStateException("Initial and exit state must be different");
         }
-        var states = new HashSet<State<S, T>>();
-        var unreachable = new HashSet<>(this.states);
+        var states = new HashMap<S, State<S, T>>();
         // Process init state
-        var init = new State<>(this.init, collectTransitions(this.init, unreachable));
+        var init = createState(this.init);
         // Process inner states
         for (var state : this.states) {
-            states.add(new State<>(state, collectTransitions(state, unreachable)));
-        }
-        if (!unreachable.isEmpty()) {
-            throw new IllegalStateException("Unreachable states found: " + unreachable);
+            states.put(state, createState(state));
         }
         // Process exit state
         var exit = new State<S, T>(this.exit);

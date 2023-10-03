@@ -71,4 +71,17 @@ public final class Transition<S, T> {
                 ", type=" + type +
                 '}';
     }
+
+    /**
+     * Returns the internal string representation of a transition
+     *
+     * @return the internal string representation of a transition
+     */
+    public String toSpecString() {
+        var builder = new StringBuilder(target.toString());
+        if (type == TransitionType.CONDITIONAL) {
+            builder.append(token);
+        }
+        return builder.toString();
+    }
 }
