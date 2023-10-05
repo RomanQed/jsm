@@ -50,12 +50,6 @@ public final class MachineModelBuilder<S, T> {
         }
     }
 
-    private void checkToken(T token) {
-        if (token != null && token.getClass() != tokenType) {
-            throw new IllegalArgumentException("The class of the token object is not equal to the expected class");
-        }
-    }
-
     /**
      * Sets the state that the finite state machine receives at the beginning of operation.
      *
@@ -132,10 +126,9 @@ public final class MachineModelBuilder<S, T> {
         return this;
     }
 
-    private void addTransition(S from, S to, T token, TransitionType type) {
+    private void addTransition(S from, S to, Token<T> token, TransitionType type) {
         checkState(from);
         checkState(to);
-        checkToken(token);
         var map = transitions.get(from);
         if (map == null) {
             throw new InvalidStateException("Required source state cannot have outgoing transitions", from);
@@ -152,11 +145,31 @@ public final class MachineModelBuilder<S, T> {
      *
      * @param from  source state key
      * @param to    target state key
-     * @param token token value
+     * @param tokens token values
      * @return this instance of {@link MachineModelBuilder}
      */
-    public MachineModelBuilder<S, T> addTransition(S from, S to, T token) {
+    @SafeVarargs
+    public final MachineModelBuilder<S, T> addTransition(S from, S to, T... tokens) {
+        if (tokens == null) {
+            addTransition(from, to, new SingleToken<>(null), TransitionType.CONDITIONAL);
+            return this;
+        }
+        if (tokens.getClass().getComponentType() != tokenType) {
+            throw new IllegalArgumentException("The class of the token object is not equal to the expected class");
+        }
+        var token = tokens.length == 1 ?
+                new SingleToken<>(tokens[0])
+                : new SetToken<>(Set.of(tokens));
         addTransition(from, to, token, TransitionType.CONDITIONAL);
+        return this;
+    }
+
+    public MachineModelBuilder<S, T> addRangeTransition(S from, S to, T start, T end) {
+        if (!Comparable.class.isAssignableFrom(tokenType)) {
+            throw new IllegalStateException("Types that do not implement the Comparable " +
+                    "interface cannot participate in range checks");
+        }
+        addTransition(from, to, new RangeToken<>(start, end), TransitionType.CONDITIONAL);
         return this;
     }
 

@@ -10,10 +10,10 @@ import java.util.Objects;
  */
 public final class Transition<S, T> {
     private final S target;
-    private final T token;
+    private final Token<T> token;
     private final TransitionType type;
 
-    Transition(S target, T token, TransitionType type) {
+    Transition(S target, Token<T> token, TransitionType type) {
         this.target = target;
         this.token = token;
         this.type = type;
@@ -33,7 +33,7 @@ public final class Transition<S, T> {
      *
      * @return the token that triggers the transition
      */
-    public T getToken() {
+    public Token<T> getToken() {
         return token;
     }
 
