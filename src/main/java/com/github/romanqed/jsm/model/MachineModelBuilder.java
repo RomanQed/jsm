@@ -37,6 +37,14 @@ public final class MachineModelBuilder<S, T> {
         return new MachineModelBuilder<>(stateType, tokenType);
     }
 
+    @SuppressWarnings("unchecked")
+    private static void checkRange(Object left, Object right) {
+        var comparable = (Comparable<Object>) left;
+        if (comparable.compareTo(right) >= 0) {
+            throw new IllegalArgumentException("Left range boundary must be less than right");
+        }
+    }
+
     private void reset() {
         init = null;
         exit = null;
@@ -45,7 +53,7 @@ public final class MachineModelBuilder<S, T> {
     }
 
     private void checkState(S state) {
-        if (state != null && state.getClass() != stateType) {
+        if (state != null && !stateType.isAssignableFrom(state.getClass())) {
             throw new InvalidStateException("The class of the state object is not equal to the expected class", state);
         }
     }
@@ -143,8 +151,8 @@ public final class MachineModelBuilder<S, T> {
     /**
      * Adds a new conditional transition to the finite state machine.
      *
-     * @param from  source state key
-     * @param to    target state key
+     * @param from   source state key
+     * @param to     target state key
      * @param tokens token values
      * @return this instance of {@link MachineModelBuilder}
      */
@@ -154,21 +162,38 @@ public final class MachineModelBuilder<S, T> {
             addTransition(from, to, new SingleToken<>(null), TransitionType.CONDITIONAL);
             return this;
         }
-        if (tokens.getClass().getComponentType() != tokenType) {
+        if (!tokenType.isAssignableFrom(tokens.getClass().getComponentType())) {
             throw new IllegalArgumentException("The class of the token object is not equal to the expected class");
         }
-        var token = tokens.length == 1 ?
-                new SingleToken<>(tokens[0])
-                : new SetToken<>(Set.of(tokens));
+        var set = Set.of(tokens);
+        var token = set.size() == 1 ?
+                new SingleToken<>(set.iterator().next())
+                : new SetToken<>(set);
         addTransition(from, to, token, TransitionType.CONDITIONAL);
         return this;
     }
 
+    /**
+     * Adds a new conditional transition by range to the finite state machine.
+     *
+     * @param from  source state key
+     * @param to    target state key
+     * @param start start range value
+     * @param end   end range value
+     * @return this instance of {@link MachineModelBuilder}
+     */
     public MachineModelBuilder<S, T> addRangeTransition(S from, S to, T start, T end) {
+        if (start == null || end == null) {
+            throw new IllegalStateException("Range boundaries must be not null");
+        }
+        if (tokenType == Boolean.class) {
+            throw new IllegalStateException("Boolean values cannot be used in range checks");
+        }
         if (!Comparable.class.isAssignableFrom(tokenType)) {
             throw new IllegalStateException("Types that do not implement the Comparable " +
                     "interface cannot participate in range checks");
         }
+        checkRange(start, end);
         addTransition(from, to, new RangeToken<>(start, end), TransitionType.CONDITIONAL);
         return this;
     }
@@ -238,7 +263,7 @@ public final class MachineModelBuilder<S, T> {
         }
         // Process exit state
         var exit = new State<S, T>(this.exit);
-        var ret = new MachineModel<>(tokenType, init, exit, states);
+        var ret = new MachineModel<>(stateType, tokenType, init, exit, states);
         this.reset();
         return ret;
     }

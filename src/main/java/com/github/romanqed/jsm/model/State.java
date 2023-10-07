@@ -10,7 +10,7 @@ import java.util.Objects;
  * @param <S> state type
  * @param <T> token type
  */
-public final class State<S, T> {
+public final class State<S, T> implements Formattable {
     private final S value;
     private final Map<S, Transition<S, T>> transitions;
     private final Transition<S, T> unconditional;
@@ -80,18 +80,14 @@ public final class State<S, T> {
                 '}';
     }
 
-    /**
-     * Returns the internal string representation of a state.
-     *
-     * @return the internal string representation of a state
-     */
-    public String toSpecString() {
+    @Override
+    public String format() {
         var builder = new StringBuilder(value.toString());
         for (var transition : transitions.values()) {
-            builder.append(transition.toSpecString());
+            builder.append(transition.format());
         }
         if (unconditional != null) {
-            builder.append(unconditional.toSpecString());
+            builder.append(unconditional.format());
         }
         return builder.toString();
     }

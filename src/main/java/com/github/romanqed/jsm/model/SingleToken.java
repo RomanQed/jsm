@@ -4,8 +4,9 @@ import java.util.Collections;
 import java.util.Objects;
 
 /**
+ * A class representing a single value token.
  *
- * @param <T>
+ * @param <T> token value type
  */
 public final class SingleToken<T> implements Token<T> {
     private final T value;
@@ -15,8 +16,9 @@ public final class SingleToken<T> implements Token<T> {
     }
 
     /**
+     * Returns token value.
      *
-     * @return
+     * @return token value
      */
     public T getValue() {
         return value;
@@ -42,6 +44,11 @@ public final class SingleToken<T> implements Token<T> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(value);
+        return Objects.hashCode(value);
+    }
+
+    @Override
+    public String format() {
+        return value.toString();
     }
 }

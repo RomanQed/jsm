@@ -4,20 +4,37 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
+ * A class describing the model of a finite state machine.
+ *
  * @param <S> state type
  * @param <T> token type
  */
-public final class MachineModel<S, T> {
+public final class MachineModel<S, T> implements Formattable {
+    private final Class<S> stateType;
     private final Class<T> tokenType;
     private final State<S, T> init;
     private final State<S, T> exit;
     private final Map<S, State<S, T>> states;
 
-    MachineModel(Class<T> tokenType, State<S, T> init, State<S, T> exit, Map<S, State<S, T>> states) {
+    MachineModel(Class<S> stateType,
+                 Class<T> tokenType,
+                 State<S, T> init,
+                 State<S, T> exit,
+                 Map<S, State<S, T>> states) {
+        this.stateType = stateType;
         this.tokenType = tokenType;
         this.init = init;
         this.exit = exit;
         this.states = Collections.unmodifiableMap(states);
+    }
+
+    /**
+     * Returns state type as instance of {@link Class}.
+     *
+     * @return state type
+     */
+    public Class<S> getStateType() {
+        return stateType;
     }
 
     /**
@@ -65,17 +82,12 @@ public final class MachineModel<S, T> {
                 '}';
     }
 
-    /**
-     * Returns the internal string representation of a finite state machine.
-     *
-     * @return the internal string representation of a finite state machine
-     */
-    public String toSpecString() {
+    public String format() {
         var builder = new StringBuilder();
-        builder.append(exit.toSpecString());
-        builder.append(init.toSpecString());
+        builder.append(exit.format());
+        builder.append(init.format());
         for (var state : states.values()) {
-            builder.append(state.toSpecString());
+            builder.append(state.format());
         }
         return builder.toString();
     }

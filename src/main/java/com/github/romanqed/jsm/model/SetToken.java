@@ -4,8 +4,9 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
+ * A class describing a token represented by an unordered set of values in the form [a, b, c, d, ...].
  *
- * @param <T>
+ * @param <T> set value type
  */
 public final class SetToken<T> implements Token<T> {
     private final Set<T> values;
@@ -34,7 +35,7 @@ public final class SetToken<T> implements Token<T> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(values);
+        return Objects.hashCode(values);
     }
 
     @Override
@@ -42,5 +43,14 @@ public final class SetToken<T> implements Token<T> {
         return "SetToken{" +
                 "values=" + values +
                 '}';
+    }
+
+    @Override
+    public String format() {
+        var builder = new StringBuilder();
+        for (var value : values) {
+            builder.append(value);
+        }
+        return builder.toString();
     }
 }

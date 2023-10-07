@@ -8,7 +8,7 @@ import java.util.Objects;
  * @param <S> state type
  * @param <T> token type
  */
-public final class Transition<S, T> {
+public final class Transition<S, T> implements Formattable {
     private final S target;
     private final Token<T> token;
     private final TransitionType type;
@@ -72,15 +72,11 @@ public final class Transition<S, T> {
                 '}';
     }
 
-    /**
-     * Returns the internal string representation of a transition
-     *
-     * @return the internal string representation of a transition
-     */
-    public String toSpecString() {
+    @Override
+    public String format() {
         var builder = new StringBuilder(target.toString());
         if (type == TransitionType.CONDITIONAL) {
-            builder.append(token);
+            builder.append(token.format());
         }
         return builder.toString();
     }

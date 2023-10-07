@@ -10,25 +10,12 @@ import com.github.romanqed.jsm.model.MachineModel;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Implementation of a finite state machine factory using jit compilation of the transition function.
  */
 public final class BytecodeMachineFactory implements StateMachineFactory {
-    private static final Set<Class<?>> ALLOWED_TOKEN_TYPES = Set.of(
-            Boolean.class,
-            Character.class,
-            Byte.class,
-            Short.class,
-            Integer.class,
-            Float.class,
-            Long.class,
-            Double.class,
-            String.class
-    );
-
     private static final String FUNCTION_NAME = "TransitionFunction";
     private final ObjectFactory<TransitionFunction<?>> factory;
     private final Map<String, Map<Integer, ?>> translations;
@@ -49,13 +36,7 @@ public final class BytecodeMachineFactory implements StateMachineFactory {
     @Override
     @SuppressWarnings("unchecked")
     public <S, T> StateMachine<S, T> create(MachineModel<S, T> model) {
-        var type = model.getTokenType();
-        if (!ALLOWED_TOKEN_TYPES.contains(type)) {
-            throw new IllegalArgumentException(
-                    "Bytecode fsm factory cannot create machine for non-constant type: " + type
-            );
-        }
-        var spec = model.toSpecString();
+        var spec = model.format();
         var name = FUNCTION_NAME + spec.hashCode();
         var function = (TransitionFunction<T>) factory.create(name, () -> {
             var translation = Translation.make(model);
