@@ -39,20 +39,17 @@ public final class BytecodeMachineFactory implements StateMachineFactory {
         var spec = model.format();
         var name = FUNCTION_NAME + spec.hashCode();
         var function = (TransitionFunction<T>) factory.create(name, () -> {
-            var translation = Translation.make(model);
+            var translation = Translation.makeTo(model);
             translations.computeIfAbsent(spec, k -> translation.getFrom());
             return Util.generateTransitionFunction(name, model, translation);
         });
-        var translation = (Map<Integer, S>) translations.get(spec);
-        if (translation == null) {
+        var table = (Map<Integer, S>) translations.get(spec);
+        if (table == null) {
             throw new IllegalStateException("Translation for spec " + spec + " not found");
         }
-        var init = translation.entrySet()
-                .stream()
-                .filter(entry -> Objects.equals(model.getInit().getValue(), entry.getValue()))
-                .findFirst()
-                .orElseThrow()
-                .getKey();
-        return new BytecodeMachine<>(function, translation, init);
+        var translation = Translation.makeTo(table);
+        var init = translation.get(model.getInit().getValue());
+        var exit = translation.get(model.getExit().getValue());
+        return new BytecodeMachine<>(function, table, init, exit);
     }
 }

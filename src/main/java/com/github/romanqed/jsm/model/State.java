@@ -82,7 +82,7 @@ public final class State<S, T> implements Formattable {
 
     @Override
     public String format() {
-        var builder = new StringBuilder(value.toString());
+        var builder = new StringBuilder(Objects.toString(value));
         for (var transition : transitions.values()) {
             builder.append(transition.format());
         }

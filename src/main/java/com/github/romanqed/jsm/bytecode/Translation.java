@@ -14,13 +14,13 @@ final class Translation {
         this.from = from;
     }
 
-    static Translation make(Map<Integer, ?> from) {
-        var to = new HashMap<Object, Integer>();
-        from.forEach((k, v) -> to.put(v, k));
-        return new Translation(to, from);
+    static Map<Object, Integer> makeTo(Map<Integer, ?> from) {
+        var ret = new HashMap<Object, Integer>();
+        from.forEach((k, v) -> ret.put(v, k));
+        return ret;
     }
 
-    static Translation make(MachineModel<?, ?> model) {
+    static Translation makeTo(MachineModel<?, ?> model) {
         var ret = new HashMap<Integer, Object>();
         var count = 0;
         ret.put(count++, model.getExit().getValue());
@@ -28,7 +28,7 @@ final class Translation {
         for (var state : model.getStates().values()) {
             ret.put(count++, state.getValue());
         }
-        return make(ret);
+        return new Translation(makeTo(ret), ret);
     }
 
     Map<?, Integer> getTo() {
