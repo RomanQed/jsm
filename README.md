@@ -71,7 +71,7 @@ public class Main {
 
 ## Authors
 
-* **[RomanQed](https://github.com/RomanQed)** - *com.github.romanqed.jsm.Main work*
+* **[RomanQed](https://github.com/RomanQed)** - *Main work*
 
 See also the list of [contributors](https://github.com/RomanQed/jsm/contributors)
 who participated in this project.
