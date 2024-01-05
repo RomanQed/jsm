@@ -9,14 +9,6 @@ package com.github.romanqed.jsm;
 public interface StateMachine<S, T> {
 
     /**
-     * Performs a transition for the specified token.
-     *
-     * @param token analyzed token
-     * @return machine state after transition
-     */
-    S step(T token);
-
-    /**
      * Launches a finite state machine on a token chain.
      * Does not change the internal state of the machine.
      *
@@ -33,6 +25,22 @@ public interface StateMachine<S, T> {
      * @return final machine state after token processing
      */
     S run(T[] tokens);
+
+    /**
+     * Returns current machine state.
+     * Synchronized with other step-by-step methods.
+     *
+     * @return current machine state
+     */
+    S getState();
+
+    /**
+     * Performs a transition for the specified token.
+     *
+     * @param token analyzed token
+     * @return machine state after transition
+     */
+    S step(T token);
 
     /**
      * Resets the state of the state machine to its init state.

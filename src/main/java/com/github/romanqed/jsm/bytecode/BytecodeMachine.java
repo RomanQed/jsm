@@ -22,14 +22,6 @@ final class BytecodeMachine<S, T> implements StateMachine<S, T> {
     }
 
     @Override
-    public S step(T token) {
-        synchronized (lock) {
-            this.state = function.transit(this.state, token);
-            return translations.get(this.state);
-        }
-    }
-
-    @Override
     public S run(Iterable<T> tokens) {
         var state = this.init;
         for (var token : tokens) {
@@ -51,6 +43,21 @@ final class BytecodeMachine<S, T> implements StateMachine<S, T> {
             }
         }
         return translations.get(state);
+    }
+
+    @Override
+    public S getState() {
+        synchronized (lock) {
+            return translations.get(this.state);
+        }
+    }
+
+    @Override
+    public S step(T token) {
+        synchronized (lock) {
+            this.state = function.transit(this.state, token);
+            return translations.get(this.state);
+        }
     }
 
     @Override
