@@ -26,6 +26,15 @@ public interface StateMachine<S, T> {
     S run(Iterable<T> tokens);
 
     /**
+     * Launches a finite state machine on a token array.
+     * Does not change the internal state of the machine.
+     *
+     * @param tokens array contains analyzed tokens
+     * @return final machine state after token processing
+     */
+    S run(T[] tokens);
+
+    /**
      * Resets the state of the state machine to its init state.
      */
     void reset();

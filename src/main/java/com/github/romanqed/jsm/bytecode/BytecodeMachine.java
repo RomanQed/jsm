@@ -42,6 +42,18 @@ final class BytecodeMachine<S, T> implements StateMachine<S, T> {
     }
 
     @Override
+    public S run(T[] tokens) {
+        var state = this.init;
+        for (var token : tokens) {
+            state = function.transit(state, token);
+            if (state == exit) {
+                return translations.get(exit);
+            }
+        }
+        return translations.get(state);
+    }
+
+    @Override
     public void reset() {
         synchronized (lock) {
             this.state = init;
