@@ -144,6 +144,9 @@ public final class MachineModelBuilder<S, T> {
         if (!Objects.equals(exit, to) && !states.contains(to)) {
             throw new InvalidStateException("Required target state not found", to);
         }
+        if (map.containsKey(to)) {
+            throw new IllegalArgumentException("Found duplicate transition");
+        }
         var transition = new Transition<>(to, token, type);
         map.put(to, transition);
     }
