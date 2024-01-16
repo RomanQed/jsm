@@ -1,7 +1,6 @@
 package com.github.romanqed.jsm.model;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A class representing a builder for a finite state machine model.
@@ -13,6 +12,7 @@ public final class MachineModelBuilder<S, T> {
     private final Class<S> stateType;
     private final Class<T> tokenType;
     private final Map<S, Map<S, Transition<S, T>>> transitions;
+    private final Map<S, S> unconditionals;
     private final Set<S> states;
     private S init;
     private S exit;
@@ -21,6 +21,7 @@ public final class MachineModelBuilder<S, T> {
         this.stateType = Objects.requireNonNull(stateType);
         this.tokenType = Objects.requireNonNull(tokenType);
         this.transitions = new HashMap<>();
+        this.unconditionals = new HashMap<>();
         this.states = new HashSet<>();
     }
 
@@ -49,11 +50,13 @@ public final class MachineModelBuilder<S, T> {
         init = null;
         exit = null;
         transitions.clear();
+        unconditionals.clear();
         states.clear();
     }
 
     private void checkState(S state) {
-        if (state != null && !stateType.isAssignableFrom(state.getClass())) {
+        Objects.requireNonNull(state);
+        if (!stateType.isAssignableFrom(state.getClass())) {
             throw new InvalidStateException("The class of the state object is not equal to the expected class", state);
         }
     }
@@ -119,7 +122,7 @@ public final class MachineModelBuilder<S, T> {
     }
 
     /**
-     * Removes a state and its transitions make the finite state machine.
+     * Removes a state and its transitions from the finite state machine.
      *
      * @param state state key
      * @return this instance of {@link MachineModelBuilder}
@@ -131,10 +134,12 @@ public final class MachineModelBuilder<S, T> {
         }
         this.transitions.remove(state);
         this.transitions.values().forEach(value -> value.remove(state));
+        this.unconditionals.remove(state);
+        this.unconditionals.values().remove(state);
         return this;
     }
 
-    private void addTransition(S from, S to, Token<T> token, TransitionType type) {
+    private void addConditionalTransition(S from, S to, Token<T> token) {
         checkState(from);
         checkState(to);
         var map = transitions.get(from);
@@ -147,7 +152,7 @@ public final class MachineModelBuilder<S, T> {
         if (map.containsKey(to)) {
             throw new IllegalArgumentException("Found duplicate transition");
         }
-        var transition = new Transition<>(to, token, type);
+        var transition = new Transition<>(to, token, TransitionType.CONDITIONAL);
         map.put(to, transition);
     }
 
@@ -162,7 +167,7 @@ public final class MachineModelBuilder<S, T> {
     @SafeVarargs
     public final MachineModelBuilder<S, T> addTransition(S from, S to, T... tokens) {
         if (tokens == null) {
-            addTransition(from, to, new SingleToken<>(null), TransitionType.CONDITIONAL);
+            addConditionalTransition(from, to, new SingleToken<>(null));
             return this;
         }
         if (!tokenType.isAssignableFrom(tokens.getClass().getComponentType())) {
@@ -172,7 +177,7 @@ public final class MachineModelBuilder<S, T> {
         var token = set.size() == 1 ?
                 new SingleToken<>(set.iterator().next())
                 : new SetToken<>(set);
-        addTransition(from, to, token, TransitionType.CONDITIONAL);
+        addConditionalTransition(from, to, token);
         return this;
     }
 
@@ -197,7 +202,7 @@ public final class MachineModelBuilder<S, T> {
                     "interface cannot participate in range checks");
         }
         checkRange(start, end);
-        addTransition(from, to, new RangeToken<>(start, end), TransitionType.CONDITIONAL);
+        addConditionalTransition(from, to, new RangeToken<>(start, end));
         return this;
     }
 
@@ -209,43 +214,70 @@ public final class MachineModelBuilder<S, T> {
      * @return this instance of {@link MachineModelBuilder}
      */
     public MachineModelBuilder<S, T> addTransition(S from, S to) {
-        addTransition(from, to, null, TransitionType.UNCONDITIONAL);
+        checkState(from);
+        checkState(to);
+        if (!transitions.containsKey(from)) {
+            throw new InvalidStateException("Required source state cannot have outgoing transitions", from);
+        }
+        if (!Objects.equals(exit, to) && !states.contains(to)) {
+            throw new InvalidStateException("Required target state not found", to);
+        }
+        if (unconditionals.containsKey(from)) {
+            throw new IllegalArgumentException("Found duplicate transition");
+        }
+        unconditionals.put(from, to);
+        return this;
+    }
+
+    private void removeConditionalTransition(S from, S to) {
+        var map = this.transitions.get(from);
+        if (map == null) {
+            return;
+        }
+        map.remove(to);
+    }
+
+    /**
+     * Removes a transition from a finite state machine.
+     *
+     * @param from source state key
+     * @param to   target state key
+     * @param type transition type
+     * @return this instance of {@link MachineModelBuilder}
+     */
+    public MachineModelBuilder<S, T> removeTransition(S from, S to, TransitionType type) {
+        checkState(from);
+        checkState(to);
+        if (type == null) {
+            removeConditionalTransition(from, to);
+            unconditionals.remove(from);
+        } else if (type == TransitionType.CONDITIONAL) {
+            removeConditionalTransition(from, to);
+        } else {
+            unconditionals.remove(from);
+        }
         return this;
     }
 
     /**
-     * Removes a transition make a finite state machine.
+     * Removes transitions of all types from a finite state machine.
      *
      * @param from source state key
      * @param to   target state key
      * @return this instance of {@link MachineModelBuilder}
      */
     public MachineModelBuilder<S, T> removeTransition(S from, S to) {
-        checkState(from);
-        checkState(to);
-        var map = this.transitions.get(from);
-        if (map == null) {
-            return this;
-        }
-        map.remove(to);
-        return this;
+        return removeTransition(from, to, null);
     }
 
     private State<S, T> createState(S state) {
         var transitions = this.transitions.get(state);
-        var found = transitions.values()
-                .stream()
-                .filter(t -> t.getType() == TransitionType.UNCONDITIONAL)
-                .collect(Collectors.toList());
-        if (found.size() > 1) {
-            throw new InvalidStateException("State cannot contains more than 1 unconditional transition", state);
-        }
-        if (found.isEmpty()) {
+        var unconditional = this.unconditionals.get(state);
+        if (unconditional == null) {
             return new State<>(state, transitions, null);
         }
-        var unconditional = found.get(0);
-        transitions.remove(unconditional.getTarget());
-        return new State<>(state, transitions, unconditional);
+        var transition = new Transition<S, T>(unconditional, null, TransitionType.UNCONDITIONAL);
+        return new State<>(state, transitions, transition);
     }
 
     /**
@@ -254,6 +286,8 @@ public final class MachineModelBuilder<S, T> {
      * @return built finite state machine model
      */
     public MachineModel<S, T> build() {
+        Objects.requireNonNull(init);
+        Objects.requireNonNull(exit);
         if (Objects.equals(init, exit)) {
             throw new IllegalStateException("Initial and exit state must be different");
         }

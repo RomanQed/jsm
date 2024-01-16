@@ -14,7 +14,7 @@ public final class ModelBuilderTest extends Assertions {
     @Test
     public void testEmptyBuilder() {
         var builder = makeBuilder();
-        assertThrows(IllegalStateException.class, builder::build);
+        assertThrows(NullPointerException.class, builder::build);
     }
 
     @Test
@@ -40,7 +40,7 @@ public final class ModelBuilderTest extends Assertions {
         var builder = makeBuilder();
         assertThrows(InvalidStateException.class, () -> builder
                 .setInitState("1")
-                .addTransition(null, "1"));
+                .addTransition("3", "1"));
     }
 
     @Test
@@ -49,7 +49,7 @@ public final class ModelBuilderTest extends Assertions {
         assertThrows(InvalidStateException.class, () -> builder
                 .setInitState("1")
                 .setExitState("2")
-                .addTransition("1", null));
+                .addTransition("1", "3"));
     }
 
     @Test
@@ -97,7 +97,8 @@ public final class ModelBuilderTest extends Assertions {
         var builder = makeBuilder();
         var model = builder
                 .setInitState("1")
-                .addTransition("1", null)
+                .setExitState("3")
+                .addTransition("1", "3")
                 .setInitState("2")
                 .build();
         assertAll(
