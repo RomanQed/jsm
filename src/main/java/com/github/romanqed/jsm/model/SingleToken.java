@@ -49,6 +49,13 @@ public final class SingleToken<T> implements Token<T> {
 
     @Override
     public String format() {
-        return value.toString();
+        return value == null ? "null" : value.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "SingleToken{" +
+                "value=" + value +
+                '}';
     }
 }
