@@ -6,7 +6,6 @@ import com.github.romanqed.jsm.model.MachineModel;
 import com.github.romanqed.jsm.model.SingleToken;
 import com.github.romanqed.jsm.model.State;
 import org.objectweb.asm.*;
-import org.objectweb.asm.commons.LocalVariablesSorter;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -21,14 +20,6 @@ final class Util {
     private static final Method HASH_CODE = Exceptions.suppress(
             () -> Object.class.getDeclaredMethod("hashCode")
     );
-
-    private static LocalVariablesSorter visitMethod(ClassWriter writer,
-                                                    int access,
-                                                    String name,
-                                                    String descriptor) {
-        var visitor = writer.visitMethod(access, name, descriptor, null, null);
-        return new LocalVariablesSorter(access, descriptor, visitor);
-    }
 
     private static SwitchMap<State<?, ?>> makeTableMap(MachineModel<?, ?> model, Map<Integer, ?> translation) {
         var init = model.getInit();
@@ -101,7 +92,7 @@ final class Util {
 
     static byte[] generateTransitionFunction(String name, MachineModel<?, ?> model, Translation translation) {
         // Init class writer
-        var writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        var writer = new LocalVariablesWriter(ClassWriter.COMPUTE_FRAMES);
         // Declare class header
         writer.visit(Opcodes.V11,
                 Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL,
@@ -112,10 +103,12 @@ final class Util {
         // Define empty constructor
         AsmUtil.createEmptyConstructor(writer);
         // Define transit method
-        var visitor = visitMethod(writer,
+        var visitor = writer.visitMethodWithLocals(
                 Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL,
                 TRANSIT.getName(),
-                Type.getMethodDescriptor(TRANSIT));
+                Type.getMethodDescriptor(TRANSIT),
+                null,
+                null);
         visitor.visitCode();
         // {
         // Define buffer: int buffer;
