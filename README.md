@@ -6,7 +6,7 @@ A lightweight library that allows you to create fast finite state machine accord
 
 To install it, you will need:
 
-* java 11+
+* Java 11+
 * Maven/Gradle
 
 ### Features
