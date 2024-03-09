@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 plugins {
     id 'java-library'
     id 'maven-publish'
@@ -23,7 +25,7 @@ repositories {
 dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.0'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.0'
-    api group: 'com.github.romanqed', name: 'jeflect', version: '1.1.2L'
+    api group: 'com.github.romanqed', name: 'jeflect', version: '1.1.4L'
 }
 
 test {
@@ -31,8 +33,29 @@ test {
 }
 
 jar {
-    from sourceSets.main.output
-    from sourceSets.main.allJava
+    manifest {
+        var date = new Date()
+        var javaVersion = System.getProperty("java.version")
+        var vmVendor = System.getProperty("java.vm.vendor")
+        var vmVersion = System.getProperty("java.vm.version")
+
+        attributes(
+                'Created-By': String.format("%s (%s %s)", javaVersion, vmVendor, vmVersion),
+                'Gradle-Version': "Gradle $gradle.gradleVersion",
+                'Build-Date': new SimpleDateFormat("yyyy-MM-dd").format(date),
+                'Build-Time': new SimpleDateFormat("HH:mm:ss.SSSZ").format(date),
+                'Built-By': 'Roman Bakaldin',
+                'Bundle-Name': 'Java State Machine',
+                'Bundle-Version': archiveVersion,
+                'Bundle-SymbolicName': archivesBaseName,
+                'Implementation-Title': archivesBaseName,
+                'Implementation-Vendor': 'github.com/romanqed',
+                'Implementation-Version': archiveVersion,
+                'Specification-Title': archivesBaseName,
+                'Specification-Vendor': 'github.com/romanqed',
+                'Specification-Version': archiveVersion
+        )
+    }
 }
 
 signing {
