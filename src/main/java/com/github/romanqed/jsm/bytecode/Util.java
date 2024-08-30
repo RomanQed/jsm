@@ -1,6 +1,5 @@
 package com.github.romanqed.jsm.bytecode;
 
-import com.github.romanqed.jeflect.AsmUtil;
 import com.github.romanqed.jfunc.Exceptions;
 import com.github.romanqed.jsm.model.MachineModel;
 import com.github.romanqed.jsm.model.SingleToken;
@@ -13,6 +12,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 final class Util {
+    static final Type OBJECT = Type.getType(Object.class);
+    static final String OBJECT_NAME = OBJECT.getInternalName();
     private static final Class<?> INTERFACE = TransitionFunction.class;
     private static final Method TRANSIT = Exceptions.suppress(
             () -> INTERFACE.getDeclaredMethod("transit", int.class, Object.class)
@@ -20,6 +21,8 @@ final class Util {
     private static final Method HASH_CODE = Exceptions.suppress(
             () -> Object.class.getDeclaredMethod("hashCode")
     );
+    private static final String INIT = "<init>";
+    private static final String EMPTY_DESCRIPTOR = "()V";
 
     private static SwitchMap<State<?, ?>> makeTableMap(MachineModel<?, ?> model, Map<Integer, ?> translation) {
         var init = model.getInit();
@@ -37,12 +40,28 @@ final class Util {
         return ret;
     }
 
+    static void pushInt(MethodVisitor visitor, int value) {
+        if (value >= -1 && value <= 5) {
+            visitor.visitInsn(Opcodes.ICONST_M1 + value + 1);
+            return;
+        }
+        if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE) {
+            visitor.visitIntInsn(Opcodes.BIPUSH, value);
+            return;
+        }
+        if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE) {
+            visitor.visitIntInsn(Opcodes.SIPUSH, value);
+            return;
+        }
+        visitor.visitLdcInsn(value);
+    }
+
     private static void processExit(State<?, ?> state, MethodVisitor visitor, int exit, Map<?, Integer> translation) {
         var unconditional = state.getUnconditional();
         if (unconditional == null) {
-            AsmUtil.pushInt(visitor, exit);
+            pushInt(visitor, exit);
         } else {
-            AsmUtil.pushInt(visitor, translation.get(unconditional.getTarget()));
+            pushInt(visitor, translation.get(unconditional.getTarget()));
         }
         visitor.visitInsn(Opcodes.IRETURN);
     }
@@ -66,9 +85,9 @@ final class Util {
             if (token instanceof SingleToken) {
                 var single = (SingleToken<?>) token;
                 var out = new Label();
-                AsmUtil.pushInt(visitor, single.getValue().hashCode());
+                pushInt(visitor, single.getValue().hashCode());
                 visitor.visitJumpInsn(Opcodes.IF_ICMPNE, out);
-                AsmUtil.pushInt(visitor, translation.get(transition.getTarget()));
+                pushInt(visitor, translation.get(transition.getTarget()));
                 visitor.visitInsn(Opcodes.IRETURN);
                 visitor.visitLabel(out);
                 processExit(state, visitor, exit, translation);
@@ -85,9 +104,23 @@ final class Util {
         var table = new LookupSwitchMap<>(Function.identity());
         map.keySet().forEach(table::put);
         table.visitSwitch(visitor, v -> processExit(state, visitor, exit, translation), (v, value) -> {
-            AsmUtil.pushInt(v, map.get(value));
+            pushInt(v, map.get(value));
             v.visitInsn(Opcodes.IRETURN);
         });
+    }
+
+    static void createEmptyConstructor(ClassWriter writer) {
+        var init = writer.visitMethod(Opcodes.ACC_PUBLIC,
+                INIT,
+                EMPTY_DESCRIPTOR,
+                null,
+                null);
+        init.visitCode();
+        init.visitVarInsn(Opcodes.ALOAD, 0);
+        init.visitMethodInsn(Opcodes.INVOKESPECIAL, OBJECT_NAME, INIT, EMPTY_DESCRIPTOR, false);
+        init.visitInsn(Opcodes.RETURN);
+        init.visitMaxs(1, 1);
+        init.visitEnd();
     }
 
     static byte[] generateTransitionFunction(String name, MachineModel<?, ?> model, Translation translation) {
@@ -101,7 +134,7 @@ final class Util {
                 Type.getInternalName(Object.class),
                 new String[]{Type.getInternalName(INTERFACE)});
         // Define empty constructor
-        AsmUtil.createEmptyConstructor(writer);
+        createEmptyConstructor(writer);
         // Define transit method
         var visitor = writer.visitMethodWithLocals(
                 Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL,
@@ -141,7 +174,7 @@ final class Util {
         var to = translation.getTo();
         var def = to.get(model.getExit().getValue());
         map.visitSwitch(visitor, v -> {
-            AsmUtil.pushInt(v, def);
+            pushInt(v, def);
             visitor.visitInsn(Opcodes.IRETURN);
         }, (v, state) -> processState(state, v, buffer, def, to));
         // }

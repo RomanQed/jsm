@@ -1,8 +1,8 @@
 open module com.github.romanqed.jsm {
     // Imports
     requires org.objectweb.asm;
-    requires com.github.romanqed.jeflect;
     requires com.github.romanqed.jfunc;
+    requires com.github.romanqed.jeflect.loader;
     // Exports
     exports com.github.romanqed.jsm;
     exports com.github.romanqed.jsm.model;

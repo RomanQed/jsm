@@ -27,7 +27,6 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package com.github.romanqed.jsm.bytecode;
 
-import com.github.romanqed.jeflect.AsmUtil;
 import org.objectweb.asm.*;
 
 /**
@@ -100,6 +99,22 @@ class LocalVariablesSorter extends MethodVisitor {
         firstLocal = nextLocal;
     }
 
+    private static Type getVarType(Object localType) {
+        Type varType = Util.OBJECT;
+        if (localType == Opcodes.INTEGER) {
+            varType = Type.INT_TYPE;
+        } else if (localType == Opcodes.FLOAT) {
+            varType = Type.FLOAT_TYPE;
+        } else if (localType == Opcodes.LONG) {
+            varType = Type.LONG_TYPE;
+        } else if (localType == Opcodes.DOUBLE) {
+            varType = Type.DOUBLE_TYPE;
+        } else if (localType instanceof String) {
+            varType = Type.getObjectType((String) localType);
+        }
+        return varType;
+    }
+
     @Override
     public void visitVarInsn(final int opcode, final int varIndex) {
         Type varType;
@@ -123,7 +138,7 @@ class LocalVariablesSorter extends MethodVisitor {
             case Opcodes.ALOAD:
             case Opcodes.ASTORE:
             case Opcodes.RET:
-                varType = AsmUtil.OBJECT;
+                varType = Util.OBJECT;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid opcode " + opcode);
@@ -195,18 +210,7 @@ class LocalVariablesSorter extends MethodVisitor {
         for (var i = 0; i < numLocal; ++i) {
             Object localType = local[i];
             if (localType != Opcodes.TOP) {
-                Type varType = AsmUtil.OBJECT;
-                if (localType == Opcodes.INTEGER) {
-                    varType = Type.INT_TYPE;
-                } else if (localType == Opcodes.FLOAT) {
-                    varType = Type.FLOAT_TYPE;
-                } else if (localType == Opcodes.LONG) {
-                    varType = Type.LONG_TYPE;
-                } else if (localType == Opcodes.DOUBLE) {
-                    varType = Type.DOUBLE_TYPE;
-                } else if (localType instanceof String) {
-                    varType = Type.getObjectType((String) localType);
-                }
+                var varType = getVarType(localType);
                 setFrameLocal(remap(oldVar, varType), localType);
             }
             oldVar += localType == Opcodes.LONG || localType == Opcodes.DOUBLE ? 2 : 1;

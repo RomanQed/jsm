@@ -1,9 +1,9 @@
 package com.github.romanqed.jsm.bytecode;
 
-import com.github.romanqed.jeflect.DefineClassLoader;
-import com.github.romanqed.jeflect.DefineLoader;
-import com.github.romanqed.jeflect.DefineObjectFactory;
-import com.github.romanqed.jeflect.ObjectFactory;
+import com.github.romanqed.jeflect.loader.DefineClassLoader;
+import com.github.romanqed.jeflect.loader.DefineLoader;
+import com.github.romanqed.jeflect.loader.DefineObjectFactory;
+import com.github.romanqed.jeflect.loader.ObjectFactory;
 import com.github.romanqed.jsm.StateMachine;
 import com.github.romanqed.jsm.StateMachineFactory;
 import com.github.romanqed.jsm.model.MachineModel;
