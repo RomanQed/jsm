@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class BytecodeMachineFactory implements StateMachineFactory {
     private static final String FUNCTION_NAME = "TransitionFunction";
     private final ObjectFactory<TransitionFunction<?>> factory;
-    private final Map<String, Map<Integer, ?>> translations;
+    private final Map<String, Object[]> translations;
 
     public BytecodeMachineFactory(ObjectFactory<TransitionFunction<?>> factory) {
         this.factory = Objects.requireNonNull(factory);
@@ -40,16 +40,13 @@ public final class BytecodeMachineFactory implements StateMachineFactory {
         var name = FUNCTION_NAME + spec.hashCode();
         var function = (TransitionFunction<T>) factory.create(name, () -> {
             var translation = Translation.makeTo(model);
-            translations.computeIfAbsent(spec, k -> translation.getFrom());
+            translations.computeIfAbsent(spec, k -> translation.from);
             return Util.generateTransitionFunction(name, model, translation);
         });
-        var table = (Map<Integer, S>) translations.get(spec);
+        var table = (S[]) translations.get(spec);
         if (table == null) {
             throw new IllegalStateException("Translation for spec " + spec + " not found");
         }
-        var translation = Translation.makeTo(table);
-        var init = translation.get(model.getInit().getValue());
-        var exit = translation.get(model.getExit().getValue());
-        return new BytecodeMachine<>(function, table, init, exit);
+        return new BytecodeMachine<>(function, table, 1, 0);
     }
 }

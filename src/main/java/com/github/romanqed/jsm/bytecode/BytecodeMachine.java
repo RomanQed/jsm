@@ -2,23 +2,19 @@ package com.github.romanqed.jsm.bytecode;
 
 import com.github.romanqed.jsm.StateMachine;
 
-import java.util.Map;
-
 final class BytecodeMachine<S, T> implements StateMachine<S, T> {
     private final TransitionFunction<T> function;
-    private final Map<Integer, S> translations;
+    private final S[] from;
     private final int init;
     private final int exit;
-    private final Object lock;
     private int state;
 
-    BytecodeMachine(TransitionFunction<T> function, Map<Integer, S> translations, int init, int exit) {
+    BytecodeMachine(TransitionFunction<T> function, S[] from, int init, int exit) {
         this.function = function;
-        this.translations = translations;
+        this.from = from;
         this.init = init;
         this.exit = exit;
         this.state = init;
-        this.lock = new Object();
     }
 
     @Override
@@ -27,10 +23,10 @@ final class BytecodeMachine<S, T> implements StateMachine<S, T> {
         for (var token : tokens) {
             state = function.transit(state, token);
             if (state == exit) {
-                return translations.get(exit);
+                return from[exit];
             }
         }
-        return translations.get(state);
+        return from[state];
     }
 
     @Override
@@ -39,31 +35,55 @@ final class BytecodeMachine<S, T> implements StateMachine<S, T> {
         for (var token : tokens) {
             state = function.transit(state, token);
             if (state == exit) {
-                return translations.get(exit);
+                return from[exit];
             }
         }
-        return translations.get(state);
+        return from[state];
+    }
+
+    @Override
+    @SuppressWarnings("Duplicates")
+    public long stamp(Iterable<T> tokens) {
+        var state = this.init;
+        var ret = 1;
+        for (var token : tokens) {
+            state = function.transit(state, token);
+            if (state == exit) {
+                return -1;
+            }
+            ret = 31 * ret + state;
+        }
+        return ret;
+    }
+
+    @Override
+    @SuppressWarnings("Duplicates")
+    public long stamp(T[] tokens) {
+        var state = this.init;
+        var ret = 1;
+        for (var token : tokens) {
+            state = function.transit(state, token);
+            if (state == exit) {
+                return -1;
+            }
+            ret = 31 * ret + state;
+        }
+        return ret;
     }
 
     @Override
     public S getState() {
-        synchronized (lock) {
-            return translations.get(this.state);
-        }
+        return from[this.state];
     }
 
     @Override
     public S step(T token) {
-        synchronized (lock) {
-            this.state = function.transit(this.state, token);
-            return translations.get(this.state);
-        }
+        this.state = function.transit(this.state, token);
+        return from[this.state];
     }
 
     @Override
     public void reset() {
-        synchronized (lock) {
-            this.state = init;
-        }
+        this.state = init;
     }
 }

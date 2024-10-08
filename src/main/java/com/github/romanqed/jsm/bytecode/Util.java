@@ -24,14 +24,14 @@ final class Util {
     private static final String INIT = "<init>";
     private static final String EMPTY_DESCRIPTOR = "()V";
 
-    private static SwitchMap<State<?, ?>> makeTableMap(MachineModel<?, ?> model, Map<Integer, ?> translation) {
+    private static SwitchMap<State<?, ?>> makeTableMap(MachineModel<?, ?> model, Object[] translation) {
         var init = model.getInit();
         var states = model.getStates();
         var mapper = (Function<Integer, State<?, ?>>) key -> {
             if (key == 1) {
                 return init;
             }
-            var value = translation.get(key);
+            var value = translation[key];
             return states.get(value);
         };
         var ret = new TableSwitchMap<>(mapper, 1, states.size() + 1);
@@ -169,9 +169,9 @@ final class Util {
         // Load state from parameter
         visitor.visitVarInsn(Opcodes.ILOAD, 1);
         // Build table-switch descriptor
-        var map = makeTableMap(model, translation.getFrom());
+        var map = makeTableMap(model, translation.from);
         // Prepare data
-        var to = translation.getTo();
+        var to = translation.to;
         var def = to.get(model.getExit().getValue());
         map.visitSwitch(visitor, v -> {
             pushInt(v, def);

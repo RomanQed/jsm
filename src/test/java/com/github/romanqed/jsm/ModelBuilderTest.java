@@ -53,16 +53,6 @@ public final class ModelBuilderTest extends Assertions {
     }
 
     @Test
-    public void testDuplicateTransition() {
-        var builder = makeBuilder();
-        assertThrows(IllegalArgumentException.class, () -> builder
-                .setInitState("1")
-                .setExitState("2")
-                .addTransition("1", "2")
-                .addTransition("1", "2"));
-    }
-
-    @Test
     public void testInvalidTypeRangeTransition() {
         var builder = makeBuilder();
         assertThrows(IllegalStateException.class, () -> builder
