@@ -42,6 +42,11 @@ public abstract class AbstractSwitchMap<T> implements SwitchMap<T> {
             visitor.visitLabel(labels[count++]);
             var key = iterator.nextInt();
             var values = hashes.get(key);
+            // If there is no such value, goto default label
+            if (values == null) {
+                visitor.visitJumpInsn(Opcodes.GOTO, defaultLabel);
+                continue;
+            }
             // Handle no collision case
             if (values.size() == 1) {
                 branchHandler.handle(visitor, values.get(0));
