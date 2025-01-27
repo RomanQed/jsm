@@ -17,7 +17,7 @@ public final class ComparatorTest {
     private static final ObjectFactory<Object> OBJECT_FACTORY = new DefineObjectFactory<>(LOADER);
 
     @SuppressWarnings("unchecked")
-    private static <T> T generateImpl(Class<T> type,  String arg, boolean l, int opcode, Comparator comparator) {
+    private static <T> T generateImpl(Class<T> type, String arg, boolean l, int opcode, Comparator comparator) {
         var name = type.getSimpleName() + "Impl";
         var writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         writer.visit(

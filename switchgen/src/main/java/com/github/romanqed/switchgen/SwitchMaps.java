@@ -2,7 +2,7 @@ package com.github.romanqed.switchgen;
 
 import java.util.*;
 
-public final class SwitchUtil {
+public final class SwitchMaps {
     private static final Set<Class<?>> TYPES = Set.of(
             // Boolean
             Boolean.class,
@@ -20,7 +20,7 @@ public final class SwitchUtil {
             Double.class
     );
 
-    private SwitchUtil() {
+    private SwitchMaps() {
     }
 
     public static <T> Map<Integer, List<T>> calculateHashes(Set<T> set) {
@@ -60,7 +60,7 @@ public final class SwitchUtil {
         return null;
     }
 
-    public static <T> SwitchMap<T> createLookupSwitchMap(Set<T> keys) {
+    public static <T> SwitchMap<T> createLookup(Set<T> keys) {
         var type = getType(keys);
         var comparator = getComparator(type);
         var hashes = calculateHashes(keys);
@@ -72,7 +72,7 @@ public final class SwitchUtil {
         return new LookupSwitchMap<>(hashes, comparator, intKeys);
     }
 
-    public static <T> SwitchMap<T> createTableSwitchMap(Set<T> keys) {
+    public static <T> SwitchMap<T> createTable(Set<T> keys) {
         var type = getType(keys);
         var comparator = getComparator(type);
         var hashes = calculateHashes(keys);
@@ -82,7 +82,7 @@ public final class SwitchUtil {
         return new TableSwitchMap<>(hashes, comparator, min, max);
     }
 
-    public static <T> SwitchMap<T> createSwitchMap(Set<T> keys, int maxDelta) {
+    public static <T> SwitchMap<T> create(Set<T> keys, int maxDelta) {
         if (maxDelta <= 0) {
             throw new IllegalArgumentException("Max delta must be greater than zero");
         }

@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-public final class LookupSwitchMap<T> extends AbstractSwitchMap<T> {
+final class LookupSwitchMap<T> extends AbstractSwitchMap<T> {
     private final int[] keys;
 
-    public LookupSwitchMap(Map<Integer, List<T>> hashes, Comparator comparator, int[] keys) {
+    LookupSwitchMap(Map<Integer, List<T>> hashes, Comparator comparator, int[] keys) {
         super(hashes, comparator);
         this.keys = keys;
     }

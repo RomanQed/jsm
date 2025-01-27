@@ -8,11 +8,11 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-public final class TableSwitchMap<T> extends AbstractSwitchMap<T> {
+final class TableSwitchMap<T> extends AbstractSwitchMap<T> {
     private final int min;
     private final int max;
 
-    public TableSwitchMap(Map<Integer, List<T>> hashes, Comparator comparator, int min, int max) {
+    TableSwitchMap(Map<Integer, List<T>> hashes, Comparator comparator, int min, int max) {
         super(hashes, comparator);
         this.min = min;
         this.max = max;
