@@ -7,6 +7,8 @@ import org.objectweb.asm.Opcodes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
@@ -25,9 +27,9 @@ public abstract class AbstractSwitchMap<T> implements SwitchMap<T> {
 
     @Override
     public void visit(MethodVisitor visitor,
-                      VisitorHandler loader,
-                      VisitorHandler handler,
-                      BranchHandler<T> branchHandler) {
+                      Consumer<MethodVisitor> loader,
+                      Consumer<MethodVisitor> defaultHandler,
+                      BiConsumer<MethodVisitor, T> branchHandler) {
         // Get keys
         var supplier = getKeysSupplier();
         // Prepare labels
@@ -52,20 +54,20 @@ public abstract class AbstractSwitchMap<T> implements SwitchMap<T> {
             }
             // Handle no collision case
             if (values.size() == 1) {
-                branchHandler.handle(visitor, values.get(0));
+                branchHandler.accept(visitor, values.get(0));
                 continue;
             }
             // Handle collision cases
             for (var value : values) {
                 // Load actual value to compare with expected
-                loader.handle(visitor);
-                comparator.compare(visitor, value, v -> branchHandler.handle(v, value));
+                loader.accept(visitor);
+                comparator.compare(visitor, value, v -> branchHandler.accept(v, value));
             }
             // If there is no any compared collision, goto default label
             visitor.visitJumpInsn(Opcodes.GOTO, defaultLabel);
         }
         // Process default label
         visitor.visitLabel(defaultLabel);
-        handler.handle(visitor);
+        defaultHandler.accept(visitor);
     }
 }
