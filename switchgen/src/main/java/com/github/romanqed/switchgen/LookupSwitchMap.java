@@ -11,13 +11,9 @@ import java.util.stream.IntStream;
 public final class LookupSwitchMap<T> extends AbstractSwitchMap<T> {
     private final int[] keys;
 
-    public LookupSwitchMap(Map<Integer, List<T>> hashes, Comparator comparator) {
+    public LookupSwitchMap(Map<Integer, List<T>> hashes, Comparator comparator, int[] keys) {
         super(hashes, comparator);
-        this.keys = hashes.keySet()
-                .stream()
-                .sorted()
-                .mapToInt(Integer::intValue)
-                .toArray();
+        this.keys = keys;
     }
 
     @Override
