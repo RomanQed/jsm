@@ -25,8 +25,8 @@ public abstract class AbstractSwitchMap<T> implements SwitchMap<T> {
 
     @Override
     public void visit(MethodVisitor visitor,
-                      LoadHandler loader,
-                      DefaultHandler handler,
+                      VisitorHandler loader,
+                      VisitorHandler handler,
                       BranchHandler<T> branchHandler) {
         // Get keys
         var supplier = getKeysSupplier();
