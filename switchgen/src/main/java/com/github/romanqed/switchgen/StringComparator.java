@@ -15,10 +15,8 @@ public final class StringComparator implements Comparator {
         // Stack: actualStringRef, expectedStringRef
         // Swap -> expectedStringRef, actualStringRef
         visitor.visitInsn(Opcodes.SWAP);
-        // Use invoke special instead of virtual because
-        // String is final class, and we want to call directly String#equals
         visitor.visitMethodInsn(
-                Opcodes.INVOKESPECIAL,
+                Opcodes.INVOKEVIRTUAL,
                 "java/lang/String",
                 "equals",
                 "(Ljava/lang/Object;)Z",
