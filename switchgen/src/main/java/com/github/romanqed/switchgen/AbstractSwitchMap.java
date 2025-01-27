@@ -14,7 +14,7 @@ public abstract class AbstractSwitchMap<T> implements SwitchMap<T> {
     protected final Map<Integer, List<T>> hashes;
     protected final Comparator comparator;
 
-    AbstractSwitchMap(Map<Integer, List<T>> hashes, Comparator comparator) {
+    protected AbstractSwitchMap(Map<Integer, List<T>> hashes, Comparator comparator) {
         this.hashes = hashes;
         this.comparator = comparator;
     }
@@ -24,7 +24,10 @@ public abstract class AbstractSwitchMap<T> implements SwitchMap<T> {
     protected abstract void visitSwitch(MethodVisitor visitor, Label defaultLabel, Label[] labels);
 
     @Override
-    public void visit(MethodVisitor visitor, DefaultHandler defaultHandler, BranchHandler<T> branchHandler) {
+    public void visit(MethodVisitor visitor,
+                      LoadHandler loader,
+                      DefaultHandler handler,
+                      BranchHandler<T> branchHandler) {
         // Get keys
         var supplier = getKeysSupplier();
         // Prepare labels
@@ -54,15 +57,15 @@ public abstract class AbstractSwitchMap<T> implements SwitchMap<T> {
             }
             // Handle collision cases
             for (var value : values) {
-                // Stack: ..., actual
-                visitor.visitInsn(Opcodes.DUP); // -> actual, actualDup
-                comparator.compare(visitor, value, v -> branchHandler.handle(v, value)); // -> actual
+                // Load actual value to compare with expected
+                loader.handle(visitor);
+                comparator.compare(visitor, value, v -> branchHandler.handle(v, value));
             }
             // If there is no any compared collision, goto default label
             visitor.visitJumpInsn(Opcodes.GOTO, defaultLabel);
         }
         // Process default label
         visitor.visitLabel(defaultLabel);
-        defaultHandler.handle(visitor);
+        handler.handle(visitor);
     }
 }
