@@ -59,9 +59,11 @@ public abstract class AbstractSwitchMap<T> implements SwitchMap<T> {
             }
             // Handle collision cases
             for (var value : values) {
+                // Load expected value
+                visitor.visitLdcInsn(value);
                 // Load actual value to compare with expected
                 loader.accept(visitor);
-                comparator.compare(visitor, value, v -> branchHandler.accept(v, value));
+                comparator.compare(visitor, v -> branchHandler.accept(v, value));
             }
             // If there is no any compared collision, goto default label
             visitor.visitJumpInsn(Opcodes.GOTO, defaultLabel);

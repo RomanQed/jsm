@@ -6,5 +6,5 @@ import java.util.function.Consumer;
 
 public interface Comparator {
 
-    void compare(MethodVisitor visitor, Object expected, Consumer<MethodVisitor> then);
+    void compare(MethodVisitor visitor, Consumer<MethodVisitor> then);
 }

@@ -9,12 +9,7 @@ import java.util.function.Consumer;
 public final class StringComparator implements Comparator {
 
     @Override
-    public void compare(MethodVisitor visitor, Object expected, Consumer<MethodVisitor> then) {
-        // Stack: actualStringRef
-        visitor.visitLdcInsn(expected);
-        // Stack: actualStringRef, expectedStringRef
-        // Swap -> expectedStringRef, actualStringRef
-        visitor.visitInsn(Opcodes.SWAP);
+    public void compare(MethodVisitor visitor, Consumer<MethodVisitor> then) {
         visitor.visitMethodInsn(
                 Opcodes.INVOKEVIRTUAL,
                 "java/lang/String",
