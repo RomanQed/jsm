@@ -24,7 +24,7 @@ public abstract class AbstractSwitchMap<T> implements SwitchMap<T> {
      */
     protected final Map<Integer, List<T>> hashes;
     /**
-     * Comparator for this type. If type has no collisions (<= 4 byte), comparator must be null.
+     * Comparator for this type. If type has no collisions (less or equal 4 byte), comparator must be null.
      */
     protected final Comparator comparator;
 
@@ -32,7 +32,7 @@ public abstract class AbstractSwitchMap<T> implements SwitchMap<T> {
      * Constructs {@link AbstractSwitchMap} with given hashes and type comparator.
      *
      * @param hashes     the specified hash mapping, must be non-null
-     * @param comparator the specified comparator, must be non-null if type has collisions (> 4 byte), null otherwise
+     * @param comparator the specified comparator, must be non-null if type has collisions (more 4 byte), null otherwise
      */
     protected AbstractSwitchMap(Map<Integer, List<T>> hashes, Comparator comparator) {
         this.hashes = hashes;
