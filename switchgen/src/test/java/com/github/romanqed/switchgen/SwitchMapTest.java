@@ -10,7 +10,6 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -100,10 +99,6 @@ public final class SwitchMapTest {
         hashPrim(mv, "java/lang/Long", "(J)I");
     }
 
-    private static void hashFloat(MethodVisitor mv) {
-        hashPrim(mv, "java/lang/Float", "(F)I");
-    }
-
     private static void hashDouble(MethodVisitor mv) {
         hashPrim(mv, "java/lang/Double", "(D)I");
     }
@@ -160,28 +155,6 @@ public final class SwitchMapTest {
         assertEquals(15L, o.map(15L));
         assertEquals(-1L, o.map(1L));
         assertEquals(-1L, o.map(10L));
-    }
-
-    @Test
-    public void testFloatLookupMap() {
-        var keys = Set.of(11F, 12F, 13F, 15F);
-        var map = SwitchMaps.createLookup(keys);
-        var o = generateImpl(
-                FM.class,
-                0,
-                SwitchMapTest::hashFloat,
-                "F",
-                Opcodes.FLOAD,
-                Opcodes.FRETURN,
-                map,
-                -1F
-        );
-        assertEquals(11F, o.map(11F));
-        assertEquals(12F, o.map(12F));
-        assertEquals(13F, o.map(13F));
-        assertEquals(15F, o.map(15F));
-        assertEquals(-1F, o.map(1F));
-        assertEquals(-1F, o.map(10F));
     }
 
     @Test
@@ -293,11 +266,6 @@ public final class SwitchMapTest {
     public interface LM {
 
         long map(long val);
-    }
-
-    public interface FM {
-
-        float map(float val);
     }
 
     public interface DM {

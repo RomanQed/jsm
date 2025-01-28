@@ -84,19 +84,6 @@ public final class ComparatorTest {
     }
 
     @Test
-    public void testFloatComparator() {
-        var cmp = generateImpl(FC.class, "F", false, Opcodes.FLOAD, new FloatComparator());
-        assertTrue(cmp.eq(0, 0));
-        assertTrue(cmp.eq(1, 1));
-        assertTrue(cmp.eq(Float.MIN_VALUE, Float.MIN_VALUE));
-        assertTrue(cmp.eq(Float.MAX_VALUE, Float.MAX_VALUE));
-        assertFalse(cmp.eq(0, 1));
-        assertFalse(cmp.eq(1, 0));
-        assertFalse(cmp.eq(Float.MIN_VALUE, Float.MAX_VALUE));
-        assertFalse(cmp.eq(Float.MAX_VALUE, Float.MIN_VALUE));
-    }
-
-    @Test
     public void testDoubleComparator() {
         var cmp = generateImpl(DC.class, "D", true, Opcodes.DLOAD, new DoubleComparator());
         assertTrue(cmp.eq(0, 0));
@@ -125,11 +112,6 @@ public final class ComparatorTest {
     public interface LC {
 
         boolean eq(long a, long b);
-    }
-
-    public interface FC {
-
-        boolean eq(float a, float b);
     }
 
     public interface DC {

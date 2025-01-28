@@ -48,9 +48,6 @@ public final class SwitchMaps {
         if (type == Long.class) {
             return new LongComparator();
         }
-        if (type == Float.class) {
-            return new FloatComparator();
-        }
         if (type == Double.class) {
             return new DoubleComparator();
         }
