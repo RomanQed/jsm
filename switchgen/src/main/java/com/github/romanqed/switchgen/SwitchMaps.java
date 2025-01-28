@@ -104,6 +104,24 @@ public final class SwitchMaps {
     }
 
     /**
+     * Creates table switch map for given min and max int values.
+     *
+     * @param min the specified min int value
+     * @param max the specified max int value
+     * @return the {@link SwitchMap} instance
+     */
+    public static SwitchMap<Integer> createTable(int min, int max) {
+        if (min >= max) {
+            throw new IllegalArgumentException("Max value must be greater than min");
+        }
+        var hashes = new HashMap<Integer, List<Integer>>();
+        for (var i = min; i <= max; ++i) {
+            hashes.put(i, List.of(i));
+        }
+        return new TableSwitchMap<>(hashes, null, min, max);
+    }
+
+    /**
      * Creates switch map for given set. Its values will be the conditions in the cases.
      * Selects table variant if calculated max delta between cases is less or equal than given max delta,
      * lookup otherwise.
