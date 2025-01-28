@@ -111,8 +111,8 @@ public final class SwitchMaps {
      * @return the {@link SwitchMap} instance
      */
     public static SwitchMap<Integer> createTable(int min, int max) {
-        if (min >= max) {
-            throw new IllegalArgumentException("Max value must be greater than min");
+        if (min > max) {
+            throw new IllegalArgumentException("Max value must be greater or equal than min");
         }
         var hashes = new HashMap<Integer, List<Integer>>();
         for (var i = min; i <= max; ++i) {
