@@ -9,10 +9,12 @@ import java.util.Map;
 final class Translation {
     final Map<?, Integer> to;
     final Object[] from;
+    final int size;
 
-    Translation(Map<?, Integer> to, Object[] from) {
+    Translation(Map<?, Integer> to, Object[] from, int size) {
         this.to = to;
         this.from = from;
+        this.size = size;
     }
 
     static Map<?, Integer> makeTo(Object[] from) {
@@ -23,7 +25,7 @@ final class Translation {
         return ret;
     }
 
-    static Translation makeTo(MachineModel<?, ?> model) {
+    static Translation of(MachineModel<?, ?> model) {
         var values = model.getStates().values();
         var length = values.size() + 2;
         var ret = (Object[]) Array.newInstance(model.getStateType(), length);
@@ -33,6 +35,6 @@ final class Translation {
         for (var state : values) {
             ret[count++] = state.getValue();
         }
-        return new Translation(makeTo(ret), ret);
+        return new Translation(makeTo(ret), ret, length);
     }
 }

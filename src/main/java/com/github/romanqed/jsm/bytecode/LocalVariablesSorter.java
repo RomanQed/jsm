@@ -41,6 +41,7 @@ import org.objectweb.asm.*;
  * @author Eric Bruneton
  */
 class LocalVariablesSorter extends MethodVisitor {
+    private static final Type OBJECT = Type.getType(Object.class);
 
     /**
      * The index of the first local variable, after formal parameters.
@@ -100,7 +101,7 @@ class LocalVariablesSorter extends MethodVisitor {
     }
 
     private static Type getVarType(Object localType) {
-        Type varType = Util.OBJECT;
+        Type varType = OBJECT;
         if (localType == Opcodes.INTEGER) {
             varType = Type.INT_TYPE;
         } else if (localType == Opcodes.FLOAT) {
@@ -138,7 +139,7 @@ class LocalVariablesSorter extends MethodVisitor {
             case Opcodes.ALOAD:
             case Opcodes.ASTORE:
             case Opcodes.RET:
-                varType = Util.OBJECT;
+                varType = OBJECT;
                 break;
             default:
                 throw new IllegalArgumentException("Invalid opcode " + opcode);

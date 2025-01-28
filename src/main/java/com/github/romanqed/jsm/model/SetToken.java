@@ -1,6 +1,5 @@
 package com.github.romanqed.jsm.model;
 
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -29,13 +28,13 @@ public final class SetToken<T> implements Token<T> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SetToken)) return false;
-        SetToken<?> setToken = (SetToken<?>) o;
-        return values.equals(setToken.values);
+        var that = (SetToken<?>) o;
+        return values.equals(that.values);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(values);
+        return values.hashCode();
     }
 
     @Override
