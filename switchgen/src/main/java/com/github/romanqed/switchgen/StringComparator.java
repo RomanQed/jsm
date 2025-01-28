@@ -6,6 +6,9 @@ import org.objectweb.asm.Opcodes;
 
 import java.util.function.Consumer;
 
+/**
+ * Implementation of the {@link Comparator} for the {@link String}. Uses {@link String#equals(Object)} method.
+ */
 public final class StringComparator implements Comparator {
 
     @Override

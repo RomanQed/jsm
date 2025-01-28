@@ -12,17 +12,47 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+/**
+ * The skeleton implementation of the {@link SwitchMap}.
+ * Contains common implementation of {@link SwitchMap#visit(MethodVisitor, Consumer, Consumer, BiConsumer)} method.
+ *
+ * @param <T> the type of the switch-case argument
+ */
 public abstract class AbstractSwitchMap<T> implements SwitchMap<T> {
+    /**
+     * Hashes of the case values with collisions.
+     */
     protected final Map<Integer, List<T>> hashes;
+    /**
+     * Comparator for this type. If type has no collisions (<= 4 byte), comparator must be null.
+     */
     protected final Comparator comparator;
 
+    /**
+     * Constructs {@link AbstractSwitchMap} with given hashes and type comparator.
+     *
+     * @param hashes     the specified hash mapping, must be non-null
+     * @param comparator the specified comparator, must be non-null if type has collisions (> 4 byte), null otherwise
+     */
     protected AbstractSwitchMap(Map<Integer, List<T>> hashes, Comparator comparator) {
         this.hashes = hashes;
         this.comparator = comparator;
     }
 
+    /**
+     * Returns the supplier of {@link IntStream} containing sorted case entries.
+     *
+     * @return the supplier of {@link IntStream} containing sorted case entries.
+     */
     protected abstract Supplier<IntStream> getKeysSupplier();
 
+    /**
+     * Visits the specified switch-case instruction.
+     *
+     * @param visitor      the method visitor
+     * @param defaultLabel the default case label
+     * @param labels       the array containing value case labels
+     */
     protected abstract void visitSwitch(MethodVisitor visitor, Label defaultLabel, Label[] labels);
 
     @Override

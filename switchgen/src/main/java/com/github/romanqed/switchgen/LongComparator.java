@@ -6,6 +6,9 @@ import org.objectweb.asm.Opcodes;
 
 import java.util.function.Consumer;
 
+/**
+ * Implementation of the {@link Comparator} for the {@link Long}. Uses LCMP opcode.
+ */
 public final class LongComparator implements Comparator {
 
     @Override

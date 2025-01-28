@@ -6,6 +6,9 @@ import org.objectweb.asm.Opcodes;
 
 import java.util.function.Consumer;
 
+/**
+ * Implementation of the {@link Comparator} for the {@link Double}. Uses DCMPL opcode.
+ */
 public final class DoubleComparator implements Comparator {
 
     @Override
