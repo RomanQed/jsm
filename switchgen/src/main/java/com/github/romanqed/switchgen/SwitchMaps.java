@@ -3,7 +3,7 @@ package com.github.romanqed.switchgen;
 import java.util.*;
 
 /**
- *
+ * A utility class containing methods that create various {@link SwitchMap} implementations.
  */
 public final class SwitchMaps {
     private static final Set<Class<?>> TYPES = Set.of(
@@ -27,9 +27,11 @@ public final class SwitchMaps {
     }
 
     /**
-     * @param set
-     * @param <T>
-     * @return
+     * Calculates hash mapping with collisions for given set.
+     *
+     * @param set the specified set
+     * @param <T> the type of elements stored in given set
+     * @return the {@link Map} containing hash mapping
      */
     public static <T> Map<Integer, List<T>> calculateHashes(Set<T> set) {
         var ret = new HashMap<Integer, List<T>>();
@@ -66,9 +68,11 @@ public final class SwitchMaps {
     }
 
     /**
-     * @param keys
-     * @param <T>
-     * @return
+     * Creates lookup switch map for given set. Its values will be the conditions in the cases.
+     *
+     * @param keys the specified set
+     * @param <T>  the type of the switch-case argument
+     * @return the {@link SwitchMap} instance
      */
     public static <T> SwitchMap<T> createLookup(Set<T> keys) {
         var type = getType(keys);
@@ -83,9 +87,11 @@ public final class SwitchMaps {
     }
 
     /**
-     * @param keys
-     * @param <T>
-     * @return
+     * Creates table switch map for given set. Its values will be the conditions in the cases.
+     *
+     * @param keys the specified set
+     * @param <T>  the type of the switch-case argument
+     * @return the {@link SwitchMap} instance
      */
     public static <T> SwitchMap<T> createTable(Set<T> keys) {
         var type = getType(keys);
@@ -98,10 +104,16 @@ public final class SwitchMaps {
     }
 
     /**
-     * @param keys
-     * @param maxDelta
-     * @param <T>
-     * @return
+     * Creates switch map for given set. Its values will be the conditions in the cases.
+     * Selects table variant if calculated max delta between cases is less or equal than given max delta,
+     * lookup otherwise.
+     * For example, for ("1", "2", "3") hashes will be (49, 50, 51), and max delta will be 1,
+     * so table switch map will be created.
+     *
+     * @param keys     the specified set
+     * @param maxDelta the cap value for the delta between neighbour cases
+     * @param <T>      the type of the switch-case argument
+     * @return the {@link SwitchMap} instance
      */
     public static <T> SwitchMap<T> create(Set<T> keys, int maxDelta) {
         if (maxDelta <= 0) {
