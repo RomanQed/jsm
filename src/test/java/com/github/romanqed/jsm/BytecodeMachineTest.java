@@ -26,6 +26,31 @@ public final class BytecodeMachineTest extends Assertions {
     }
 
     @Test
+    public void testTokenCollisions() {
+        // Strings with hash collision
+        var c1 = "AaAa";
+        var c2 = "BBBB";
+        var c3 = "AaBB";
+        var c4 = "BBAa";
+        var builder = MachineModelBuilder.create(String.class, String.class);
+        builder.setInitState("I");
+        builder.setExitState("E");
+        builder.addState("C1");
+        builder.addState("C2");
+        builder.addState("C3");
+        builder.addState("C4");
+        builder.addTransition("I", "C1", c1);
+        builder.addTransition("I", "C2", c2);
+        builder.addTransition("I", "C3", c3);
+        builder.addTransition("I", "C4", c4);
+        var machine = FACTORY.create(builder.build());
+        assertEquals("C1", machine.run(List.of(c1)));
+        assertEquals("C2", machine.run(List.of(c2)));
+        assertEquals("C3", machine.run(List.of(c3)));
+        assertEquals("C4", machine.run(List.of(c4)));
+    }
+
+    @Test
     public void testFullSequence() {
         assertEquals(9, MACHINE.run(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9}));
     }
