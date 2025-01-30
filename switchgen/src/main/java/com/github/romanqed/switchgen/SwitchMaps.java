@@ -145,10 +145,10 @@ public final class SwitchMaps {
                 .mapToInt(Integer::intValue)
                 .sorted()
                 .toArray();
-        var actualDelta = 0;
+        var actualDelta = 0L;
         var last = intKeys.length - 1;
         for (var i = 0; i < last; ++i) {
-            var delta = intKeys[i + 1] - intKeys[i];
+            var delta = Math.abs((long) intKeys[i + 1] - intKeys[i]);
             if (delta > actualDelta) {
                 actualDelta = delta;
             }
