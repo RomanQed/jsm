@@ -27,8 +27,9 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.0'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.0'
     testImplementation group: 'com.github.romanqed', name: 'jeflect-loader', version: '1.0.0'
+    testImplementation group: 'org.ow2.asm', name: 'asm', version: '9.8'
     // Dependencies
-    api group: 'org.ow2.asm', name: 'asm', version: '9.7.1'
+    compileOnly group: 'org.ow2.asm', name: 'asm', version: '9.8'
 }
 
 test {
