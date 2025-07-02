@@ -1,5 +1,6 @@
 package com.github.romanqed.jsm.bytecode;
 
+import com.github.romanqed.asm.sorter.LocalVariablesWriter;
 import com.github.romanqed.jeflect.loader.DefineClassLoader;
 import com.github.romanqed.jeflect.loader.DefineLoader;
 import com.github.romanqed.jeflect.loader.DefineObjectFactory;
