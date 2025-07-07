@@ -62,9 +62,16 @@ public final class MachineModelBuilder<S, T> {
     }
 
     /**
+     * Sets a comparator used to order states in the resulting finite state machine.
+     * <p>
+     * This comparator affects the order in which transitions are stored and processed.
+     * If no comparator is provided (i.e., {@code null}), the natural ordering of states will be used,
+     * assuming {@code S} implements {@link Comparable}.
+     * If {@code comparator} is {@code null}, the state type {@code S} must implement {@link Comparable};
+     * otherwise, an exception may be thrown during model construction.
      *
-     * @param comparator
-     * @return
+     * @param comparator a {@link Comparator} to be used for state ordering, or {@code null} for natural order
+     * @return this instance of {@link MachineModelBuilder}
      */
     public MachineModelBuilder<S, T> setComparator(Comparator<S> comparator) {
         this.comparator = comparator;
