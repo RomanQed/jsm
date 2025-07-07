@@ -11,18 +11,17 @@ import java.util.*;
 public final class MachineModelBuilder<S, T> {
     private final Class<S> stateType;
     private final Class<T> tokenType;
-    private final Map<S, Map<S, Transition<S, T>>> transitions;
-    private final Map<S, S> unconditionals;
-    private final Set<S> states;
+    private Comparator<S> comparator;
+    private Map<S, Map<S, Transition<S, T>>> transitions;
+    private Map<S, S> unconditionals;
+    private Set<S> states;
     private S init;
     private S exit;
 
     public MachineModelBuilder(Class<S> stateType, Class<T> tokenType) {
         this.stateType = Objects.requireNonNull(stateType);
         this.tokenType = Objects.requireNonNull(tokenType);
-        this.transitions = new HashMap<>();
-        this.unconditionals = new HashMap<>();
-        this.states = new HashSet<>();
+        this.reset();
     }
 
     /**
@@ -49,9 +48,10 @@ public final class MachineModelBuilder<S, T> {
     private void reset() {
         init = null;
         exit = null;
-        transitions.clear();
-        unconditionals.clear();
-        states.clear();
+        this.comparator = null;
+        this.transitions = new HashMap<>();
+        this.unconditionals = new HashMap<>();
+        this.states = new HashSet<>();
     }
 
     private void checkState(S state) {
@@ -59,6 +59,16 @@ public final class MachineModelBuilder<S, T> {
         if (!stateType.isAssignableFrom(state.getClass())) {
             throw new InvalidStateException("The class of the state object is not equal to the expected class", state);
         }
+    }
+
+    /**
+     *
+     * @param comparator
+     * @return
+     */
+    public MachineModelBuilder<S, T> setComparator(Comparator<S> comparator) {
+        this.comparator = comparator;
+        return this;
     }
 
     /**
@@ -265,7 +275,8 @@ public final class MachineModelBuilder<S, T> {
     }
 
     private State<S, T> createState(S state) {
-        var transitions = this.transitions.get(state);
+        var transitions = new TreeMap<S, Transition<S, T>>(comparator);
+        transitions.putAll(this.transitions.get(state));
         var unconditional = this.unconditionals.get(state);
         if (unconditional == null) {
             return new State<>(state, transitions, null);
@@ -277,7 +288,7 @@ public final class MachineModelBuilder<S, T> {
     /**
      * Completes the build of the finite state machine model and returns the result.
      *
-     * @return built finite state machine model
+     * @return built a finite state machine model
      */
     public MachineModel<S, T> build() {
         Objects.requireNonNull(init);
@@ -285,7 +296,7 @@ public final class MachineModelBuilder<S, T> {
         if (Objects.equals(init, exit)) {
             throw new IllegalStateException("Initial and exit state must be different");
         }
-        var states = new HashMap<S, State<S, T>>();
+        var states = new TreeMap<S, State<S, T>>(comparator);
         // Process init state
         var init = createState(this.init);
         // Process inner states

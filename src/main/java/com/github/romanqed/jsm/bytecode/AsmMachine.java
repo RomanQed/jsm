@@ -2,14 +2,14 @@ package com.github.romanqed.jsm.bytecode;
 
 import com.github.romanqed.jsm.StateMachine;
 
-final class BytecodeMachine<S, T> implements StateMachine<S, T> {
+final class AsmMachine<S, T> implements StateMachine<S, T> {
     private final TransitionFunction<T> function;
     private final S[] from;
     private final int init;
     private final int exit;
     private int state;
 
-    BytecodeMachine(TransitionFunction<T> function, S[] from, int init, int exit) {
+    AsmMachine(TransitionFunction<T> function, S[] from, int init, int exit) {
         this.function = function;
         this.from = from;
         this.init = init;

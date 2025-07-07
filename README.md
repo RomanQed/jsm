@@ -39,7 +39,7 @@ dependencies {
 ```Java
 package com.github.romanqed.jsm;
 
-import com.github.romanqed.jsm.bytecode.BytecodeMachineFactory;
+import com.github.romanqed.jsm.bytecode.AsmMachineFactory;
 import com.github.romanqed.jsm.model.MachineModelBuilder;
 
 import java.util.List;
@@ -55,7 +55,7 @@ public class Main {
                 .addTransition("Init", "Hello", 'h')
                 .addTransition("Hello", "World", 'w')
                 .build();
-        var factory = new BytecodeMachineFactory();
+        var factory = new AsmMachineFactory();
         var machine = factory.create(model);
         var tokens = List.of('h', 'w');
         System.out.println(machine.run(tokens));

@@ -24,9 +24,9 @@ import java.util.function.Consumer;
 /**
  * Implementation of a finite state machine factory using jit compilation of the transition function.
  */
-public final class BytecodeMachineFactory implements StateMachineFactory {
+public final class AsmMachineFactory implements StateMachineFactory {
     private static final int DEFAULT_MAX_DELTA = 10;
-    private static final String FUNCTION_NAME = "TransitionFunction";
+    private static final String FUNCTION_NAME = "T";
     private static final Class<?> INTERFACE = TransitionFunction.class;
     private static final Method TRANSIT = Exceptions.suppress(
             () -> INTERFACE.getDeclaredMethod("transit", int.class, Object.class)
@@ -40,21 +40,21 @@ public final class BytecodeMachineFactory implements StateMachineFactory {
     private final Map<String, Object[]> translations;
     private final int maxDelta;
 
-    public BytecodeMachineFactory(ObjectFactory<TransitionFunction<?>> factory, int maxDelta) {
+    public AsmMachineFactory(ObjectFactory<TransitionFunction<?>> factory, int maxDelta) {
         this.factory = Objects.requireNonNull(factory);
         this.translations = new ConcurrentHashMap<>();
         this.maxDelta = maxDelta;
     }
 
-    public BytecodeMachineFactory(DefineLoader loader, int maxDelta) {
+    public AsmMachineFactory(DefineLoader loader, int maxDelta) {
         this(new DefineObjectFactory<>(loader), maxDelta);
     }
 
-    public BytecodeMachineFactory(int maxDelta) {
+    public AsmMachineFactory(int maxDelta) {
         this(new DefineClassLoader(), maxDelta);
     }
 
-    public BytecodeMachineFactory() {
+    public AsmMachineFactory() {
         this(DEFAULT_MAX_DELTA);
     }
 
@@ -192,6 +192,6 @@ public final class BytecodeMachineFactory implements StateMachineFactory {
         if (table == null) {
             throw new IllegalStateException("Translation for spec " + spec + " not found");
         }
-        return new BytecodeMachine<>(function, table, 1, 0);
+        return new AsmMachine<>(function, table, 1, 0);
     }
 }

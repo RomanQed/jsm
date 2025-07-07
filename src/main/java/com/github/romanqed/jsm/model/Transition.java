@@ -74,7 +74,10 @@ public final class Transition<S, T> implements Formattable {
 
     @Override
     public String format() {
-        var builder = new StringBuilder(Objects.toString(target));
+        var builder = new StringBuilder();
+        if (target != null) {
+            builder.append(target);
+        }
         if (type == TransitionType.CONDITIONAL) {
             builder.append(token.format());
         }

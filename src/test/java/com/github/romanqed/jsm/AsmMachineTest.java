@@ -1,6 +1,6 @@
 package com.github.romanqed.jsm;
 
-import com.github.romanqed.jsm.bytecode.BytecodeMachineFactory;
+import com.github.romanqed.jsm.bytecode.AsmMachineFactory;
 import com.github.romanqed.jsm.model.MachineModel;
 import com.github.romanqed.jsm.model.MachineModelBuilder;
 import org.junit.jupiter.api.Assertions;
@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 
-public final class BytecodeMachineTest extends Assertions {
-    private static final StateMachineFactory FACTORY = new BytecodeMachineFactory();
+public final class AsmMachineTest extends Assertions {
+    private static final StateMachineFactory FACTORY = new AsmMachineFactory();
     private static final MachineModel<Integer, Integer> MODEL = createModel();
     private static final StateMachine<Integer, Integer> MACHINE = FACTORY.create(MODEL);
 
