@@ -39,7 +39,7 @@ dependencies {
 ```Java
 package com.github.romanqed.jsm;
 
-import com.github.romanqed.jsm.bytecode.AsmMachineFactory;
+import com.github.romanqed.jsm.asm.AsmMachineFactory;
 import com.github.romanqed.jsm.model.MachineModelBuilder;
 
 import java.util.List;

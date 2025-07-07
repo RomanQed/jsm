@@ -1,4 +1,4 @@
-package com.github.romanqed.jsm.bytecode;
+package com.github.romanqed.jsm.asm;
 
 import com.github.romanqed.asm.sorter.LocalVariablesWriter;
 import com.github.romanqed.jeflect.loader.DefineClassLoader;

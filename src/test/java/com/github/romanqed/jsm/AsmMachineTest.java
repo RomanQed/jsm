@@ -1,6 +1,6 @@
 package com.github.romanqed.jsm;
 
-import com.github.romanqed.jsm.bytecode.AsmMachineFactory;
+import com.github.romanqed.jsm.asm.AsmMachineFactory;
 import com.github.romanqed.jsm.model.MachineModel;
 import com.github.romanqed.jsm.model.MachineModelBuilder;
 import org.junit.jupiter.api.Assertions;

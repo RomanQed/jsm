@@ -1,4 +1,4 @@
-package com.github.romanqed.jsm.bytecode;
+package com.github.romanqed.jsm.asm;
 
 import com.github.romanqed.jsm.model.State;
 import org.objectweb.asm.ClassWriter;

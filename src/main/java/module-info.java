@@ -8,5 +8,5 @@ module com.github.romanqed.jsm {
     // Exports
     exports com.github.romanqed.jsm;
     exports com.github.romanqed.jsm.model;
-    exports com.github.romanqed.jsm.bytecode;
+    exports com.github.romanqed.jsm.asm;
 }

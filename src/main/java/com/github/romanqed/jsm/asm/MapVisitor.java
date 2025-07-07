@@ -1,4 +1,4 @@
-package com.github.romanqed.jsm.bytecode;
+package com.github.romanqed.jsm.asm;
 
 import com.github.romanqed.jsm.model.RangeToken;
 import com.github.romanqed.jsm.model.SetToken;

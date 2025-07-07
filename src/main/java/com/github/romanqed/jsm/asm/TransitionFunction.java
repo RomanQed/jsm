@@ -1,4 +1,4 @@
-package com.github.romanqed.jsm.bytecode;
+package com.github.romanqed.jsm.asm;
 
 /**
  * An interface describing a function used inside the bytecode state machine.
