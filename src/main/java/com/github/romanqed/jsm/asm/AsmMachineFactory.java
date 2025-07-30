@@ -28,10 +28,10 @@ public final class AsmMachineFactory implements StateMachineFactory {
     private static final int DEFAULT_MAX_DELTA = 10;
     private static final String FUNCTION_NAME = "T";
     private static final Class<?> INTERFACE = TransitionFunction.class;
-    private static final Method TRANSIT = Exceptions.suppress(
+    private static final Method TRANSIT = Exceptions.silent(
             () -> INTERFACE.getDeclaredMethod("transit", int.class, Object.class)
     );
-    private static final Method HASH_CODE = Exceptions.suppress(
+    private static final Method HASH_CODE = Exceptions.silent(
             () -> Object.class.getDeclaredMethod("hashCode")
     );
     private static final int STATE_INDEX = 1;
